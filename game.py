@@ -23,10 +23,16 @@ player_xp = 0  # New XP counter
 keys = pyglet.window.key.KeyStateHandler()
 window.push_handlers(keys)
 
+
 # Define Player Class
 class Player(pyglet.sprite.Sprite):
     def __init__(self, x, y):
-        super().__init__(pyglet.image.SolidColorImagePattern((0, 255, 0, 255)).create_image(30, 30), x, y, batch=batch)
+        super().__init__(
+            pyglet.image.SolidColorImagePattern((0, 255, 0, 255)).create_image(30, 30),
+            x,
+            y,
+            batch=batch,
+        )
         self.speed = PLAYER_SPEED
         self.health = player_health
         self.time_since_last_shot = 0
@@ -60,21 +66,32 @@ class Player(pyglet.sprite.Sprite):
 
     def shoot(self, enemy):
         dx, dy = enemy.x - self.x, enemy.y - self.y
-        distance = math.sqrt(dx ** 2 + dy ** 2)
-        bullet_dx, bullet_dy = (dx / distance) * BULLET_SPEED, (dy / distance) * BULLET_SPEED
-        bullet = Bullet(self.x + self.width // 2, self.y + self.height // 2, bullet_dx, bullet_dy)
+        distance = math.sqrt(dx**2 + dy**2)
+        bullet_dx, bullet_dy = (
+            (dx / distance) * BULLET_SPEED,
+            (dy / distance) * BULLET_SPEED,
+        )
+        bullet = Bullet(
+            self.x + self.width // 2, self.y + self.height // 2, bullet_dx, bullet_dy
+        )
         bullets.append(bullet)
+
 
 # Define Enemy Class
 class Enemy(pyglet.sprite.Sprite):
     def __init__(self, x, y):
-        super().__init__(pyglet.image.SolidColorImagePattern((255, 0, 0, 255)).create_image(20, 20), x, y, batch=batch)
+        super().__init__(
+            pyglet.image.SolidColorImagePattern((255, 0, 0, 255)).create_image(20, 20),
+            x,
+            y,
+            batch=batch,
+        )
         self.speed = ENEMY_SPEED
         self.health = 20
 
     def move_towards_player(self, player, dt):
         dx, dy = player.x - self.x, player.y - self.y
-        distance = math.sqrt(dx ** 2 + dy ** 2)
+        distance = math.sqrt(dx**2 + dy**2)
         if distance > 5:  # Small threshold to stop jittering
             self.x += (dx / distance) * self.speed * dt
             self.y += (dy / distance) * self.speed * dt
@@ -87,10 +104,18 @@ class Enemy(pyglet.sprite.Sprite):
             enemies.remove(self)
             self.delete()
 
+
 # Define Bullet Class
 class Bullet(pyglet.sprite.Sprite):
     def __init__(self, x, y, dx, dy):
-        super().__init__(pyglet.image.SolidColorImagePattern((255, 255, 0, 255)).create_image(10, 10), x, y, batch=batch)
+        super().__init__(
+            pyglet.image.SolidColorImagePattern((255, 255, 0, 255)).create_image(
+                10, 10
+            ),
+            x,
+            y,
+            batch=batch,
+        )
         self.dx = dx
         self.dy = dy
         self.damage = 10
@@ -113,8 +138,10 @@ class Bullet(pyglet.sprite.Sprite):
             bullets.remove(self)
             self.delete()
 
+
 # Initialize player
 player = Player(window.width // 2, window.height // 2)
+
 
 # Enemy spawn function
 def spawn_enemy(dt):
@@ -122,6 +149,7 @@ def spawn_enemy(dt):
     spawn_y = random.choice([0, window.height])
     enemy = Enemy(spawn_x, spawn_y)
     enemies.append(enemy)
+
 
 # Update function
 def update(dt):
@@ -141,29 +169,39 @@ def update(dt):
         pyglet.app.exit()
         print("Game Over!")
 
+
 # Draw function
 @window.event
 def on_draw():
     window.clear()
     batch.draw()
     # Draw player health and XP on screen
-    health_label = pyglet.text.Label(f'Health: {player_health}',
-                                     font_name='Arial',
-                                     font_size=18,
-                                     x=10, y=window.height - 30,
-                                     color=(255, 255, 255, 255))
+    health_label = pyglet.text.Label(
+        f"Health: {player_health}",
+        font_name="Arial",
+        font_size=18,
+        x=10,
+        y=window.height - 30,
+        color=(255, 255, 255, 255),
+    )
     health_label.draw()
-    
-    xp_label = pyglet.text.Label(f'XP: {player_xp}',  # Display XP
-                                 font_name='Arial',
-                                 font_size=18,
-                                 x=10, y=window.height - 60,
-                                 color=(255, 255, 255, 255))
+
+    xp_label = pyglet.text.Label(
+        f"XP: {player_xp}",  # Display XP
+        font_name="Arial",
+        font_size=18,
+        x=10,
+        y=window.height - 60,
+        color=(255, 255, 255, 255),
+    )
     xp_label.draw()
 
+
 # Schedule updates and enemy spawning
-pyglet.clock.schedule_interval(update, 1/60.0)  # 60 FPS
-pyglet.clock.schedule_interval(spawn_enemy, ENEMY_SPAWN_RATE)  # Spawn an enemy every second
+pyglet.clock.schedule_interval(update, 1 / 60.0)  # 60 FPS
+pyglet.clock.schedule_interval(
+    spawn_enemy, ENEMY_SPAWN_RATE
+)  # Spawn an enemy every second
 
 # Run the game
 pyglet.app.run()
