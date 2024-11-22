@@ -1,3 +1,4 @@
+# imports
 import pyglet
 import random
 import math
