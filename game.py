@@ -13,12 +13,24 @@ WEAPON_RANGE = 200
 BULLET_SPEED = 300
 CREATURE_HEIGHT = 30
 CREATURE_WIDTH = 30
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
 
 # Initialize game
-window = pyglet.window.Window(800, 600)
+window = pyglet.window.Window(WINDOW_WIDTH, WINDOW_HEIGHT)
 batch = pyglet.graphics.Batch()  # Centralized batch for rendering
 keys = pyglet.window.key.KeyStateHandler()
 window.push_handlers(keys)
+
+# Load the background image
+background_image = pyglet.image.load("graphics/terrain/forest/grass_background.png")
+
+# Create a sprite for the background
+background = pyglet.sprite.Sprite(background_image, x=0, y=0)
+
+# Scale the background to fit the window
+background.scale_x = WINDOW_WIDTH / background.width
+background.scale_y = WINDOW_HEIGHT / background.height
 
 # Initialize player
 player = Player(400, 300, batch, image_path="graphics/wizard.png")  # Pass batch here
@@ -63,6 +75,10 @@ def update(dt):
 @window.event
 def on_draw():
     window.clear()
+
+    # Draw the background first
+    background.draw()
+
     batch.draw()  # Render all sprites in the batch
 
     # Draw health and XP
