@@ -3,7 +3,7 @@ import math
 from bullet import Bullet
 
 class Player(pyglet.sprite.Sprite):
-    def __init__(self, x, y, batch, image_path, scale):
+    def __init__(self, x, y, batch, image_path, scale, xp):
         # Initialize the parent class
         image = pyglet.image.load(image_path)
         super().__init__(image, x=x, y=y, batch=batch)
@@ -17,8 +17,8 @@ class Player(pyglet.sprite.Sprite):
         self.time_since_last_shot = 0
         self.hitbox_width = self.width + 20  # Extend hitbox width
         self.hitbox_height = self.height + 20  # Extend hitbox height
-
         self.hitbox_padding = 10  # Padding around the hitbox
+        self.xp = xp
 
     def collides_with(self, other):
         return (
@@ -60,5 +60,8 @@ class Player(pyglet.sprite.Sprite):
         dx, dy = enemy.x - self.x, enemy.y - self.y
         distance = math.sqrt(dx ** 2 + dy ** 2)
         bullet_dx, bullet_dy = (dx / distance) * bullet_speed, (dy / distance) * bullet_speed
-        bullet = Bullet(self.x + self.width // 2, self.y + self.height // 2, bullet_dx, bullet_dy, self.batch)
+        bullet = Bullet(self.x + self.width // 2, self.y + self.height // 2, bullet_dx, bullet_dy, self.batch, player=self)
         bullets.append(bullet)
+
+    def increment_xp(self, enemy_xp):
+        self.xp += enemy_xp

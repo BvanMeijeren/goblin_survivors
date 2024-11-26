@@ -33,7 +33,7 @@ background.scale_x = WINDOW_WIDTH / background.width
 background.scale_y = WINDOW_HEIGHT / background.height
 
 # Initialize player
-player = Player(400, 300, batch, image_path="graphics/wizard.png", scale=0.1)  # Pass batch here
+player = Player(400, 300, batch, image_path="graphics/wizard.png", scale=0.1, xp=0)  # Pass batch here
 enemies = []
 bullets = []
 player_health = 100
@@ -48,7 +48,6 @@ def spawn_enemy(dt):
 
 # Update function
 def update(dt):
-    global player_health, player_xp
     player.update(dt, keys, bullets, enemies, WEAPON_RANGE, BULLET_SPEED, FIRE_INTERVAL)
 
     # Update bullets
@@ -59,16 +58,17 @@ def update(dt):
     # Update enemies
     for enemy in enemies[:]:
         enemy.move_towards_player(player, dt)
-        if math.hypot(player.x - enemy.x, player.y - enemy.y) < 20:  # Collision
-            player_health -= 1
+        # Collision
+        if math.hypot(player.x - enemy.x, player.y - enemy.y) < 20: 
+            player.health -= 1
             enemies.remove(enemy)
-            enemy.hit(damage=1, enemies=enemy)
+            player.increment_xp(enemy.xp)
             #enemy.delete()
 
     # End game condition
-    if player_health <= 0:
+    if player.health <= 0:
         pyglet.app.exit()
-        print(f"Game Over! Final XP: {player_xp}")
+        print(f"Game Over! Final XP: {player.xp}")
 
 # Draw function
 @window.event
@@ -81,8 +81,8 @@ def on_draw():
     batch.draw()  # Render all sprites in the batch
 
     # Draw health and XP
-    health_label = pyglet.text.Label(f'Health: {player_health}', x=10, y=570, color=(255, 255, 255, 255))
-    xp_label = pyglet.text.Label(f'XP: {player_xp}', x=10, y=540, color=(255, 255, 255, 255))
+    health_label = pyglet.text.Label(f'Health: {player.health}', x=10, y=570, color=(255, 255, 255, 255))
+    xp_label = pyglet.text.Label(f'XP: {player.xp}', x=10, y=540, color=(255, 255, 255, 255))
     health_label.draw()
     xp_label.draw()
 

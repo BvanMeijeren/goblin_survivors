@@ -6,6 +6,9 @@ class Enemy(pyglet.sprite.Sprite):
     def __init__(self, x, y, batch, image_path, scale):
         image = pyglet.image.load(image_path)
         super().__init__(image, x, y, batch=batch)
+        
+        # xp given to palyer upon killing the enemy 
+        self.xp = 1
 
         # scaling
         self.scale = scale
@@ -14,7 +17,6 @@ class Enemy(pyglet.sprite.Sprite):
         self.health = 20
         # Enemy initialization
         self.hitbox_offset = 15  # Extend the enemy's hitbox
-
         self.hitbox_padding = 10  # Padding around the hitbox
 
     def collides_with(self, other):
@@ -32,10 +34,12 @@ class Enemy(pyglet.sprite.Sprite):
             self.x += (dx / distance) * self.speed * dt
             self.y += (dy / distance) * self.speed * dt
 
-    def hit(self, damage, enemies):
+    def hit(self, damage, enemies, player):
         self.health -= damage
         print(self.health)
+        
+        # enemy death
         if self.health <= 0:
             enemies.remove(self)
             self.delete()
-
+            player.increment_xp(self.xp)
