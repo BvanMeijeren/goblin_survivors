@@ -33,8 +33,7 @@ background.scale_x = WINDOW_WIDTH / background.width
 background.scale_y = WINDOW_HEIGHT / background.height
 
 # Initialize player
-player = Player(400, 300, batch, image_path="graphics/wizard.png")  # Pass batch here
-player.scale = 0.1
+player = Player(400, 300, batch, image_path="graphics/wizard.png", scale=0.1)  # Pass batch here
 enemies = []
 bullets = []
 player_health = 100
@@ -44,8 +43,7 @@ player_xp = 0
 def spawn_enemy(dt):
     x = random.choice([0, 800])
     y = random.choice([0, 600])
-    enemy = Enemy(x, y, batch, image_path="graphics/goblin.png")
-    enemy.scale = 0.1
+    enemy = Enemy(x, y, batch, image_path="graphics/goblin.png",scale=0.1)
     enemies.append(enemy)  # Pass batch here
 
 # Update function
@@ -64,7 +62,8 @@ def update(dt):
         if math.hypot(player.x - enemy.x, player.y - enemy.y) < 20:  # Collision
             player_health -= 1
             enemies.remove(enemy)
-            enemy.delete()
+            enemy.hit(damage=1, enemies=enemy)
+            #enemy.delete()
 
     # End game condition
     if player_health <= 0:

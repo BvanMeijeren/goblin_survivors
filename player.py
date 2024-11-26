@@ -2,19 +2,31 @@ import pyglet
 import math
 from bullet import Bullet
 
-# Define Player Class
 class Player(pyglet.sprite.Sprite):
-    def __init__(self, x, y, batch, image_path=None):
-        if image_path:
-            image = pyglet.image.load(image_path)
-        else:
-            # Default image (green rectangle)
-            image = pyglet.image.SolidColorImagePattern((0, 255, 0, 255)).create_image(30, 30)
-        super().__init__(image, x, y, batch=batch)
+    def __init__(self, x, y, batch, image_path, scale):
+        # Initialize the parent class
+        image = pyglet.image.load(image_path)
+        super().__init__(image, x=x, y=y, batch=batch)
 
+        # scaling
+        self.scale = scale
+
+        # Player-specific attributes
         self.speed = 200
         self.health = 100
         self.time_since_last_shot = 0
+        self.hitbox_width = self.width + 20  # Extend hitbox width
+        self.hitbox_height = self.height + 20  # Extend hitbox height
+
+        self.hitbox_padding = 10  # Padding around the hitbox
+
+    def collides_with(self, other):
+        return (
+            self.x - self.hitbox_padding < other.x + other.width * other.scale + self.hitbox_padding and
+            self.x + self.width * self.scale + self.hitbox_padding > other.x - self.hitbox_padding and
+            self.y - self.hitbox_padding < other.y + other.height * other.scale + self.hitbox_padding and
+            self.y + self.height * self.scale + self.hitbox_padding > other.y - self.hitbox_padding
+        )
 
     def update(self, dt, keys, bullets, enemies, weapon_range, bullet_speed, fire_interval):
         # WASD movement
