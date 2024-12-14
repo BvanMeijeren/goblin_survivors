@@ -60,7 +60,10 @@ def update(dt):
         # Update player inputs
         input_handler.update_gameplay_inputs(dt, player)
         # Pass the pressed keys dictionary to the player
-        player.update(dt, input_handler.pressed_keys, bullets, enemies, WEAPON_RANGE, BULLET_SPEED, FIRE_INTERVAL)
+        player.update(dt, input_handler.pressed_keys, bullets, WEAPON_RANGE, BULLET_SPEED, FIRE_INTERVAL)
+
+        # shoot
+        input_handler._handle_shoot_key_press(player=player, bullets=bullets, bullet_speed= BULLET_SPEED)
 
         # Update bullets
         for bullet in bullets[:]:
@@ -100,7 +103,14 @@ def on_draw():
 
 @window.event
 def on_key_press(symbol, modifiers):
-    input_handler.handle_key_press(symbol, modifiers, player=player, upgrade_menu=upgrade_menu)
+    input_handler.handle_key_press(
+        symbol, 
+        modifiers, 
+        player=player, 
+        upgrade_menu=upgrade_menu, 
+        bullets=bullets, 
+        bullet_speed=BULLET_SPEED
+    )
 
 @window.event
 def on_key_release(symbol, modifiers):

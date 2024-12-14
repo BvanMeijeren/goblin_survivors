@@ -9,11 +9,12 @@ class InputHandler:
         self.game_mode = mode
 
     # General function that chooses keys for the active game mode
-    def handle_key_press(self, symbol, modifiers, player=None, upgrade_menu=None):
+    def handle_key_press(self, symbol, modifiers, player=None, upgrade_menu=None, bullets=None, bullet_speed=300):
         self.pressed_keys[symbol] = True
 
         if self.game_mode == "gameplay" and player:
             self._handle_gameplay_key_press(symbol, player)
+            self._handle_shoot_key_press(player, bullets, bullet_speed)
 
         if self.game_mode == "upgrade_menu" and upgrade_menu:
             self._handle_upgrade_key_press(symbol, upgrade_menu)
@@ -28,6 +29,17 @@ class InputHandler:
         if symbol == pyglet.window.key.SPACE:
             print("Player triggered an action!")  # Example: Shooting
             player.shoot()  # Call a shoot method if it exists
+
+    def _handle_shoot_key_press(self, player, bullets, bullet_speed):
+        """Handle shooting based on arrow key presses."""
+        if self.pressed_keys.get(pyglet.window.key.UP, False):
+            player.shoot("up", bullets, bullet_speed)
+        if self.pressed_keys.get(pyglet.window.key.DOWN, False):
+            player.shoot("down", bullets, bullet_speed)
+        if self.pressed_keys.get(pyglet.window.key.LEFT, False):
+            player.shoot("left", bullets, bullet_speed)
+        if self.pressed_keys.get(pyglet.window.key.RIGHT, False):
+            player.shoot("right", bullets, bullet_speed)
 
     # Gameplay inputs based on press and hold (continuous) 
     def update_gameplay_inputs(self, dt, player):
