@@ -3,7 +3,7 @@ import math
 from bullet import Bullet
 
 class Player(pyglet.sprite.Sprite):
-    def __init__(self, x, y, batch, image_path, scale, xp):
+    def __init__(self, x, y, batch, image_path, scale, xp, xp_upgrade_threshold):
         # Initialize the parent class
         image = pyglet.image.load(image_path)
         super().__init__(image, x=x, y=y, batch=batch)
@@ -19,6 +19,7 @@ class Player(pyglet.sprite.Sprite):
         self.hitbox_height = self.height + 20  # Extend hitbox height
         self.hitbox_padding = 10  # Padding around the hitbox
         self.xp = xp
+        self.xp_upgrade_threshold = xp_upgrade_threshold 
 
     def collides_with(self, other):
         return (
@@ -28,16 +29,22 @@ class Player(pyglet.sprite.Sprite):
             self.y + self.height * self.scale + self.hitbox_padding > other.y - self.hitbox_padding
         )
 
-    def update(self, dt, keys, bullets, enemies, weapon_range, bullet_speed, fire_interval):
-        # WASD movement
-        if keys[pyglet.window.key.W]:
-            self.y += self.speed * dt
-        if keys[pyglet.window.key.S]:
-            self.y -= self.speed * dt
-        if keys[pyglet.window.key.A]:
-            self.x -= self.speed * dt
-        if keys[pyglet.window.key.D]:
-            self.x += self.speed * dt
+    # Player WASD movement
+    def move_up(self, dt):
+        self.y += self.speed * dt
+
+    def move_down(self, dt):
+        self.y -= self.speed * dt
+
+    def move_left(self, dt):
+        self.x -= self.speed * dt
+
+    def move_right(self, dt):
+        self.x += self.speed * dt
+
+    # other update player actions
+    def update(self, dt, pressed_keys, bullets, enemies, weapon_range, bullet_speed, fire_interval):
+
 
         # Keep the player within window boundaries
         self.x = max(0, min(self.x, 800 - self.width))  # Adjust for window width
