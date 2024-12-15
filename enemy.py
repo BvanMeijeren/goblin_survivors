@@ -6,7 +6,7 @@ class Enemy(pyglet.sprite.Sprite):
     def __init__(self, x, y, batch, image_path, scale):
         image = pyglet.image.load(image_path)
         super().__init__(image, x, y, batch=batch)
-        
+
         # xp given to palyer upon killing the enemy 
         self.xp = 1
 
@@ -27,6 +27,7 @@ class Enemy(pyglet.sprite.Sprite):
             self.y + self.height * self.scale + self.hitbox_padding > other.y - self.hitbox_padding
         )
 
+    # AI pattern
     def move_towards_player(self, player, dt):
         dx, dy = player.x - self.x, player.y - self.y
         distance = math.sqrt(dx ** 2 + dy ** 2)
@@ -34,6 +35,7 @@ class Enemy(pyglet.sprite.Sprite):
             self.x += (dx / distance) * self.speed * dt
             self.y += (dy / distance) * self.speed * dt
 
+    # Hit detection
     def hit(self, damage, enemies, player):
         self.health -= damage
         print(self.health)

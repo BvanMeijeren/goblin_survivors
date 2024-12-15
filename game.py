@@ -8,9 +8,10 @@ from image_scaler import scale_image
 from upgrade_menu import UpgradePopup 
 from upgrades import upgrades
 from input_handler import InputHandler
+from room import Room
 
 # Constants
-ENEMY_SPAWN_RATE = 1.0
+ENEMY_SPAWN_RATE = 0.1
 FIRE_INTERVAL = 0.5
 WEAPON_RANGE = 200
 BULLET_SPEED = 300
@@ -28,30 +29,50 @@ window.push_handlers(keys)
 # Game Mode Manager
 input_handler = InputHandler()
 
-# Load the background image
-background_image = pyglet.image.load("graphics/terrain/forest/grass_background.png")
-
-# Create a sprite for the background
-background = pyglet.sprite.Sprite(background_image, x=0, y=0)
-
-# Scale the background to fit the window
-background.scale_x = WINDOW_WIDTH / background.width
-background.scale_y = WINDOW_HEIGHT / background.height
-
 # Initialize player
 player = Player(400, 300, batch, image_path="graphics/wizard.png", scale=0.1, xp=0, xp_upgrade_threshold=10)  # Pass batch here
 enemies = []
 bullets = []
 
+# Initialize first room
+current_room = Room(difficulty_level=1, max_enemies=5, batch=batch, window_width=WINDOW_WIDTH, window_height=WINDOW_HEIGHT)
+
 # Initialize upgrade menu 
 upgrade_menu = UpgradePopup(batch, player, upgrades)
 
-# Enemy spawn function
+# Spawn enemies based on room 
 def spawn_enemy(dt):
-    x = random.choice([0, 800])
-    y = random.choice([0, 600])
-    enemy = Enemy(x, y, batch, image_path="graphics/goblin.png",scale=0.1)
-    enemies.append(enemy)  # Pass batch here
+    """Spawn enemies in the current room."""
+    current_room.spawn_enemy()
+
+# Transition to a new room
+def enter_new_room():
+    """Simulate the player entering a new room."""
+    global current_room
+    print("Entering a new room...")
+    
+    # Create a new room with updated properties (e.g., increased difficulty)
+    current_room = Room(
+        difficulty_level=current_room.difficulty_level + 1,
+        max_enemies=5 + current_room.difficulty_level,
+        batch=batch,
+        window_width=WINDOW_WIDTH,
+        window_height=WINDOW_HEIGHT
+    )
+
+    # Reset player position to the starting point in the new room
+    player.x = 50  # Start at the left edge
+    player.y = WINDOW_HEIGHT // 2  # Center vertically
+    pyglet.clock.schedule_interval(spawn_enemy, ENEMY_SPAWN_RATE)
+    # Optionally, spawn enemies immediately in the new room
+    #for _ in range(current_room.max_enemies):
+    #    current_room.spawn_enemy()
+
+def player_has_entered_new_room():
+    """Check if the player can transition to the next room."""
+    all_enemies_defeated = len(current_room.enemies) == 0
+    in_exit_zone = player.x > WINDOW_WIDTH - 60
+    return all_enemies_defeated and in_exit_zone
 
 # Global update function
 def update(dt):
@@ -62,6 +83,15 @@ def update(dt):
         # Pass the pressed keys dictionary to the player
         player.update(dt, input_handler.pressed_keys, bullets, WEAPON_RANGE, BULLET_SPEED, FIRE_INTERVAL)
 
+        # Check if enemies have reached max; stop spawning in this room
+        if len(current_room.enemies) >= current_room.max_enemies:
+            pyglet.clock.unschedule(spawn_enemy)
+        
+        # Player triggers room transition
+        if player_has_entered_new_room():  # Define your condition
+            enter_new_room()
+            pyglet.clock.schedule_interval(spawn_enemy, 1.0)
+
         # shoot
         input_handler._handle_shoot_key_press(player=player, bullets=bullets, bullet_speed= BULLET_SPEED)
 
@@ -71,11 +101,11 @@ def update(dt):
                 bullets.remove(bullet)
 
         # Update enemies
-        for enemy in enemies[:]:
+        for enemy in current_room.enemies[:]:  # Iterate over a copy of the list
             enemy.move_towards_player(player, dt)
             if math.hypot(player.x - enemy.x, player.y - enemy.y) < 20:
                 player.health -= 1
-                enemies.remove(enemy)
+                current_room.enemies.remove(enemy)
                 player.increment_xp(enemy.xp)
         
         # Player death
@@ -94,17 +124,20 @@ def update(dt):
 @window.event
 def on_draw():
     window.clear()
-    background.draw()
+    current_room.draw_room(WINDOW_WIDTH,WINDOW_HEIGHT)
     batch.draw()
 
+    # Draw the UI menu stuff
     health_label = pyglet.text.Label(f'Health: {player.health}', x=10, y=570, color=(255, 255, 255, 255))
     xp_label = pyglet.text.Label(f'XP: {player.xp}', x=10, y=540, color=(255, 255, 255, 255))
     speed_label = pyglet.text.Label(f'Movement speed: {round(player.speed)}', x=10, y=510, color=(255, 255, 255, 255))
     shot_cooldown_label = pyglet.text.Label(f'Shot cooldown: {round(player.shot_cooldown,1)}', x=10, y=480, color=(255, 255, 255, 255))
+    room_label = pyglet.text.Label(f'Room difficulty: {current_room.difficulty_level}', x=10, y=450, color=(255, 255, 255, 255))
     health_label.draw()
     xp_label.draw()
     speed_label.draw()
     shot_cooldown_label.draw()
+    room_label.draw()
 
 @window.event
 def on_key_press(symbol, modifiers):
@@ -123,6 +156,6 @@ def on_key_release(symbol, modifiers):
 
 # Schedule functions
 pyglet.clock.schedule_interval(update, 1/60)
-pyglet.clock.schedule_interval(spawn_enemy, ENEMY_SPAWN_RATE)
 
+# Run the app
 pyglet.app.run()
