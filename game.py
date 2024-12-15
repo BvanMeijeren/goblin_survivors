@@ -87,6 +87,7 @@ def update(dt):
     if player.xp >= player.xp_upgrade_threshold and input_handler.game_mode != "upgrade_menu":
         player.xp = 0  # Reset XP for next level
         input_handler.set_mode("upgrade_menu")
+        upgrade_menu.pick_available_upgrades()
         upgrade_menu.show()
 
 # Draw function

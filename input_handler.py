@@ -55,11 +55,16 @@ class InputHandler:
 
     def _handle_upgrade_key_press(self, symbol, upgrade_menu):
         """Trigger upgrades based on key presses."""
-        if symbol == pyglet.window.key._1:
+        if symbol == pyglet.window.key._1 and len(upgrade_menu.available_upgrades) >= 1:
             upgrade_menu.apply_upgrade(0)
             self.game_mode = "gameplay"
-        
-        elif symbol == pyglet.window.key._2:
+        elif symbol == pyglet.window.key._2 and len(upgrade_menu.available_upgrades) >= 2:
             upgrade_menu.apply_upgrade(1)
+            self.game_mode = "gameplay"
+        elif symbol == pyglet.window.key._3 and len(upgrade_menu.available_upgrades) >= 3:
+            upgrade_menu.apply_upgrade(2)
+            self.game_mode = "gameplay"
+        elif symbol == pyglet.window.key._4 and len(upgrade_menu.available_upgrades) >= 4:
+            upgrade_menu.apply_upgrade(3)
             self.game_mode = "gameplay"
 

@@ -20,6 +20,11 @@ def upgrade_movement_speed(player):
     player.speed *= 1.1
     print(f"Player speed increased to {player.speed}")
 
+def upgrade_shot_cooldown(player):
+    player.shot_cooldown *=0.9
+    print(f"Player shot cooldown reduced with 10% to {player.shot_cooldown}")
+
+
 # List of all upgrades
 upgrades = [
     Upgrade(
