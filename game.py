@@ -98,8 +98,12 @@ def on_draw():
 
     health_label = pyglet.text.Label(f'Health: {player.health}', x=10, y=570, color=(255, 255, 255, 255))
     xp_label = pyglet.text.Label(f'XP: {player.xp}', x=10, y=540, color=(255, 255, 255, 255))
+    speed_label = pyglet.text.Label(f'Movement speed: {round(player.speed)}', x=10, y=510, color=(255, 255, 255, 255))
+    shot_cooldown_label = pyglet.text.Label(f'Shot cooldown: {round(player.shot_cooldown,1)}', x=10, y=480, color=(255, 255, 255, 255))
     health_label.draw()
     xp_label.draw()
+    speed_label.draw()
+    shot_cooldown_label.draw()
 
 @window.event
 def on_key_press(symbol, modifiers):

@@ -15,7 +15,7 @@ class Player(pyglet.sprite.Sprite):
         self.speed = 200
         self.health = 100
         self.time_since_last_shot = 0
-        self.shot_cooldown = 0.2
+        self.shot_cooldown = 0.4
         self.hitbox_width = self.width + 20  # Extend hitbox width
         self.hitbox_height = self.height + 20  # Extend hitbox height
         self.hitbox_padding = 10  # Padding around the hitbox
